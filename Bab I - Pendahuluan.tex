@@ -3,127 +3,158 @@
 \label{chap:pendahuluan}
 % --- Latar Belakang ---
 \section{Latar Belakang}
-Menurut \textcite{saewong2002}, Subbab ini \autocite{saewong2002} menjelaskan dasar pemikiran, motivasi, kebutuhan, alasan, atau urgensi pemilihan masalah tugas akhir. Subbab ini berisi penjelasan ringkas tentang kondisi atau situasi yang ada saat ini terkait dengan topik yang dibahas. Tujuan utamanya adalah untuk memberikan informasi secukupnya kepada pembaca agar memahami topik yang akan dibahas. Dalam subbab ini, jelaskan hal-hal berikut ini:
-\begin{enumerate}
-\item	Kondisi atau situasi topik yang dibahas beserta permasalahannya, misalnya tentang pengelolaan informasi di fasilitas kesehatan daerah pedesaan saat ini dan masalah yang dihadapi, berdasarkan hasil survei atau wawancara dengan pihak terkait.
-\item	Urgensi atau pentingnya penyelesaian masalah tersebut, misalnya dampak negatif yang ditimbulkan jika masalah tersebut tidak diselesaikan.
-\item	Berbagai solusi yang telah diterapkan maupun solusi yang memungkinkan untuk diterapkan untuk menyelesaikan masalah tersebut, berdasarkan hasil studi literatur, wawancara dengan pihak terkait, atau kunjungan lapangan.
-\item   Kelemahan atau kekurangan dari solusi yang telah diterapkan atau yang memungkinkan untuk diterapkan tersebut, yang menjadi dasar pemikiran dalam merumuskan masalah tugas akhir.
-\end{enumerate}
-Penulisan latar belakang masalah yang baik akan mengantarkan pembaca kepada pemahaman yang jelas tentang topik yang akan dibahas, 
-sehingga pembaca dapat mengikuti pembahasan pada bab atau subbab berikutnya dengan baik. Oleh karena itu, 
-penulis diharapkan melakukan investigasi yang mendalam untuk mengumpulkan fakta-fakta yang relevan dengan topik yang dibahas, 
-baik melalui studi literatur, wawancara dengan pihak terkait, maupun kunjungan lapangan. Hasil studi ini dijelaskan secara \emph{ringkas} di dalam subbab ini.
-Penjelasan hasil studi literatur yang komprehensif dapat dijabarkan di Bab II secara sistematis.
+Engineer produksi di PHE OSES memakai aplikasi Wingman Web App setiap hari. Aplikasi itu menyimpan data operasional sumur, pompa, dan barge. Barge adalah kapal kerja lepas pantai. Engineer memakai data itu untuk menyusun pekerjaan harian.
 
-Dalam menulis latar belakang, hindari penulisan yang bersifat terlalu umum atau terlalu luas cakupannya sehingga sulit untuk dihubungkan dengan topik yang dibahas dalam tugas akhir,
-seperti:
-\begin{enumerate}
-    \item "Pentingnya teknologi informasi dalam kehidupan manusia."
-    \item "Perkembangan pesat teknologi \emph{artificial intelligence} di era digital."
-    \item "Tantangan dalam pengelolaan data besar (\emph{big data}) di berbagai sektor industri."
-    \item "Peran teknologi informasi dalam meningkatkan kualitas layanan kesehatan."
-\end{enumerate}
-Penulisan yang terlalu umum atau luas cakupannya akan menyulitkan penulis dalam merumuskan masalah, tujuan, metodologi, dan evaluasi tugas akhir.
+Wingman Web App memuat sebuah chatbot bernama Wingman Assistant. Engineer menulis pertanyaan dalam bahasa Indonesia. Chatbot mengubah pertanyaan itu menjadi perintah SQL. Chatbot menjalankan perintah itu ke basis data. Chatbot lalu menulis jawaban berbentuk kalimat dan tabel. Cara kerja ini disebut Text-to-SQL, yaitu pengubahan pertanyaan manusia menjadi perintah basis data.
 
-Jika ada referensi yang digunakan dalam penulisan latar belakang, cantumkan referensi tersebut dengan benar menggunakan \texttt{biblatex} sesuai dengan contoh penulisan kutipan dan daftar pustaka yang telah disediakan dalam template ini.
-Sebagai contoh, pada paragraf berikut ini terdapat kutipan dari dua referensi yang berbeda \autocite{laudon2020, pressman2019}. 
-Ada dua format penulisan sitasi yang dapat digunakan, yaitu format naratif dan format parentetik.
-Contoh penulisan kutipan dengan format naratif adalah sebagai berikut:
-\begin{displayquote}
-Menurut \textcite{laudon2020}, sistem informasi adalah kombinasi dari teknologi informasi dan aktivitas orang yang menggunakan teknologi tersebut untuk mendukung operasi dan manajemen organisasi.
-\end{displayquote}
-Contoh penulisan kutipan dengan format parentetik adalah sebagai berikut:
-\begin{displayquote}
-    Sistem informasi merupakan kombinasi dari teknologi informasi dan aktivitas orang yang menggunakan teknologi tersebut untuk mendukung operasi dan manajemen organisasi \autocite{laudon2020}.
-\end{displayquote}
+Basis data Wingman berukuran besar. Skema public berisi 206 tabel dan 3.249 kolom. Skema itu memuat 439 foreign key. Foreign key adalah penanda hubungan antartabel. Chatbot harus memilih tabel yang benar dari 206 pilihan tersebut.
+
+Basis data hampir tidak menyimpan penjelasan tabel. PostgreSQL menyediakan fasilitas COMMENT untuk menyimpan keterangan. Skema public memakai fasilitas itu pada 15 tabel dan 1 kolom saja. Chatbot menebak arti sebuah kolom dari nama kolomnya.
+
+Penulis merekam satu percakapan nyata di Wingman Assistant. Engineer menanyakan jadwal barge hari itu. Chatbot menjalankan 25 langkah untuk menjawab satu pertanyaan. Chatbot menjalankan 12 perintah SQL di dalam 25 langkah itu. Empat perintah gagal dan mengembalikan pesan kesalahan.
+
+Chatbot memakai alias ws tanpa mendaftarkan tabelnya pada klausa FROM. PostgreSQL menolak perintah itu dengan kode 42P01 pada langkah 8. Chatbot lalu memanggil kolom platform\_code pada tabel platforms. Kolom itu tidak ada. PostgreSQL menolak perintah itu dengan kode 42703 pada langkah 10. Chatbot kemudian memanggil kolom barage\_name pada tabel barges. Nama kolom yang benar adalah barge\_name. Chatbot salah mengetik satu huruf pada langkah 14. Chatbot terakhir memanggil kolom status pada tabel barge\_schedules. Tabel itu memakai nama esp\_status. Penulis menduga kesalahan keempat terjadi pada langkah 18.
+
+Chatbot mencatat satu temuan penting pada langkah 23. Catatan itu menyatakan data barge hari ini kosong. Chatbot tetap menulis judul "Jadwal Barge Aktif Hari Ini" pada jawaban akhirnya. Jawaban itu memuat dua baris bertanggal Oktober sampai November 2026. Chatbot sendiri menyebut tanggal hari ini 24 Mei 2026. Jawaban akhir tidak cocok dengan catatan langkah 23.
+
+Jawaban itu memuat dua nomor baris, yaitu 6084 dan 6085. Penulis mencari kedua nomor tersebut di data contoh. Data contoh memuat nomor 6463 sampai 6608. Penulis belum menemukan penyebab selisih ini.
+
+Engineer lalu menanyakan sumber data kepada chatbot. Chatbot menjawab bahwa dirinya tidak menjalankan query. Catatan langkah mencatat 12 perintah SQL. Pengakuan chatbot bertentangan dengan catatan langkahnya sendiri.
+
+Penulis membagi masalah di atas menjadi dua kelas. Kelas pertama adalah pemilihan tabel dan kolom. Chatbot memilih tabel atau kolom yang salah, lalu perintah SQL gagal. Kelas kedua adalah kesesuaian jawaban dengan hasil query. Chatbot menulis nilai yang tidak punya pasangan pada hasil query.
+
+Engineer produksi memakai jawaban chatbot untuk pekerjaan lapangan. Jadwal barge menentukan urutan pemasangan dan penarikan pompa. Jawaban yang salah dapat menggeser urutan pekerjaan itu. Engineer harus memeriksa ulang setiap jawaban ke basis data. Pemeriksaan ulang menghapus manfaat chatbot itu sendiri. Penulis belum mengukur kerugian waktu maupun biaya dalam angka.
+
+Peneliti lain sudah mengusulkan beberapa cara. \textcite{talaei2024chesscontextualharnessingefficient} membangun sistem CHESS. Sistem itu memakai komponen Schema Selector. Komponen tersebut memangkas skema sebelum sistem menulis SQL. Pada skema gabungan berisi 4.337 kolom, komponen itu menaikkan akurasi sebesar 2\%. Komponen itu juga memakai token 5 kali lebih sedikit.
+
+Talaei dkk. menguji sistemnya tanpa sebagian komponen. Tanpa langkah select\_tables, nilai execution accuracy turun 6,12 poin. Tanpa langkah revise, nilai tersebut turun 6,80 poin. Pengujian itu memakai 147 soal.
+
+Perusahaan besar sudah memakai cara serupa. Uber melaporkan sistem QueryGPT pada tahun 2024. Uber memperkirakan waktu menulis query turun dari 10 menit menjadi 3 menit. Pinterest melaporkan tugas 35\% lebih cepat. Pinterest juga melaporkan penerimaan jawaban pertama naik dari 20\% menjadi di atas 40\%.
+
+Peneliti juga menguji Text-to-SQL pada basis data perusahaan. \textcite{lei2025spider20evaluatinglanguage} menyusun Spider 2.0. Sistem terbaik hanya menjawab benar 21,3\% soal pada kumpulan itu. Sistem serupa menjawab benar 73,0\% pada BIRD dan 91,2\% pada Spider 1.0.
+
+\textcite{liao2026entsqlbenchmarkgroundingtexttosql} menyusun EntSQL. Mereka mencatat 96,0\% contoh membutuhkan pengetahuan di luar skema. Sistem terbaik menjawab benar 15,9\% dengan dokumen panjang. Nilai itu naik menjadi 21,4\% dengan keterangan ringkas.
+
+Cara di atas belum menjawab kasus Wingman sepenuhnya. Talaei dkk. memakai skema gabungan, bukan basis data produksi. Konfigurasi terbaik mereka memakai 20 kandidat SQL dan 10 uji unit per pertanyaan. Wingman membatasi satu pekerjaan pada 60 perintah SQL. Penulis menilai konfigurasi tersebut berat untuk batas itu.
+
+Uber dan Pinterest melaporkan angka dari catatan internal. Uber menyebut angkanya sebagai perkiraan. Pinterest menulis bahwa datanya tidak mengontrol perbedaan tugas. Penulis memakai kedua angka itu sebagai gambaran arah saja.
+
+Cara di atas mengukur satu hal, yaitu kebenaran perintah SQL. Cara itu tidak memeriksa kalimat jawaban. Kasus Wingman menunjukkan perintah SQL berhasil pada langkah 24. Jawaban akhir tetap tidak cocok dengan hasil query. \textcite{NEURIPS2023_ed3fea90} menunjukkan penjelasan model bisa masuk akal tetapi tidak setia pada proses aslinya.
+
+Celah tersebut menjadi dasar tugas akhir ini. Penulis akan membandingkan beberapa cara pemilihan tabel. Penulis juga akan membandingkan beberapa cara pemeriksaan jawaban. Penulis mengukur keduanya pada basis data Wingman.
+
 % --- Rumusan Masalah ---
 \section{Rumusan Masalah}
-Subbab ini berisi masalah utama yang dibahas dalam tugas akhir. Perumusan masalah yang baik memiliki struktur sebagai berikut:
-\begin{enumerate}
-\item	Pokok persoalan dari kondisi atau situasi yang ada saat ini. Dengan kata lain, jelaskan kelemahan atau kekurangan dari kondisi, situasi, atau solusi yang dijelaskan pada latar belakang. Ini merupakan pokok rumusan masalah.
-\item	Elaborasi lebih lanjut urgensi penyelesaian masalah tersebut (mengapa penting untuk diselesaikan dan akibat yang dapat terjadi jika tidak diselesaikan).
-\item	Usulan singkat terkait dengan solusi yang ditawarkan untuk menyelesaikan persoalan.
-Penting untuk diperhatikan bahwa persoalan yang dideskripsikan pada subbab ini akan dipertanggungjawabkan di bab Evaluasi (apakah terselesaikan atau tidak).
-\end{enumerate}
-Hindari penulisan masalah yang terlalu umum atau terlalu luas cakupannya sehingga sulit untuk diselesaikan dalam jangka waktu pelaksanaan tugas akhir, 
-seperti:
-\begin{enumerate}
-    \item "Bagaimana cara meningkatkan kualitas layanan kesehatan di Indonesia?"
-    \item "Bagaimana cara mengoptimalkan penggunaan energi di perkotaan?"
-    \item "Bagaimana cara mengurangi kemacetan lalu lintas di kota besar?"
-    \item "Bagaimana cara membangun sistem irigasi sawah menggunakan \emph{AI}?"
-\end{enumerate}
-Rumusan masalah yang baik dan spesifik akan memudahkan penulis dalam menentukan tujuan, metodologi, dan evaluasi tugas akhir.
+Wingman Assistant menghasilkan jawaban yang belum dapat dipercaya engineer. Chatbot memilih tabel dan kolom yang salah. Chatbot juga menulis nilai tanpa pasangan pada hasil query. Kedua hal itu muncul pada satu percakapan yang sama.
 
-Selain itu, hindari menuliskan pertanyaan yang merupakan sebuah keniscayaan yang harus dijawab atau dikerjakan 
-dalam pelaksanaan tugas akhir, seperti:
+Engineer memakai jawaban chatbot untuk memutuskan pekerjaan lapangan. Jawaban yang salah dapat menggeser urutan pekerjaan pompa. Engineer akhirnya memeriksa ulang setiap jawaban secara manual. Chatbot kehilangan manfaatnya jika keadaan ini dibiarkan.
+
+Penulis mengusulkan dua tambahan pada sistem. Tambahan pertama memilih tabel secara bertahap dengan bantuan tabel deskripsi. Tambahan kedua memeriksa setiap nilai jawaban terhadap hasil query. Penulis menguji kedua tambahan itu pada basis data Wingman.
+
+Rumusan masalah tugas akhir ini adalah sebagai berikut.
 \begin{enumerate}
-    \item "Bagaimana cara melakukan analisis kebutuhan sistem informasi rumah sakit?"
-    \item "Bagaimana cara merancang basis data untuk aplikasi X?"
-    \item "Bagaimana cara mengimplementasikan \textit{large language model} untuk deteksi penyakit Y?"
-    \item "Bagaimana cara menguji sistem penyiraman tanaman berbasis IoT yang akan dibuat?"
+\item	Cara pemilihan tabel mana yang paling menurunkan jumlah perintah SQL gagal pada basis data Wingman? Penulis membandingkan empat cara pada Bab III, yaitu prompt berisi seluruh skema, prompt berisi contoh per kasus, pencarian kemiripan teks, dan pemilihan tabel bertahap dengan tabel deskripsi.
+\item	Cara pemeriksaan jawaban mana yang paling banyak menangkap nilai tanpa pasangan pada hasil query? Penulis membandingkan empat cara pada Bab III, yaitu tanpa pemeriksaan, instruksi pada prompt, pencocokan nilai otomatis ke baris hasil query, dan pemeriksaan oleh model kedua.
+\item	Berapa tambahan waktu, token, dan jumlah perintah SQL dari kedua cara terpilih? Penulis membandingkan empat konfigurasi pada Bab III, yaitu sistem sekarang, sistem dengan pemilihan tabel saja, sistem dengan pemeriksaan jawaban saja, dan sistem dengan keduanya.
 \end{enumerate}
-Kegiatan analisis, perancangan, implementasi, dan pengujian merupakan tahapan yang harus dilakukan dalam pelaksanaan tugas akhir,
-sehingga pertanyaan-pertanyaan tersebut tidak perlu dimasukkan ke dalam rumusan masalah.
 
 % --- Tujuan ---
 \section{Tujuan}
-Tuliskan \textbf{tujuan utama} dan/atau tujuan detail yang akan dicapai dalam pelaksanaan tugas akhir. 
-Fokuskan isi subbab ini pada hasil akhir yang ingin diperoleh setelah tugas akhir diselesaikan 
-terkait dengan penyelesaian persoalan pada rumusan masalah. 
-Penting untuk diperhatikan bahwa tujuan yang dideskripsikan pada subbab ini akan dipertanggungjawabkan 
-di akhir pelaksanaan tugas akhir. Oleh karena itu, tuliskan juga \emph{kriteria keberhasilan} tugas akhir ini.
+Tujuan utama tugas akhir ini adalah merancang, membangun, dan mengukur prototipe Wingman Assistant yang memilih tabel lebih dulu dan memeriksa jawabannya terhadap hasil query. Tujuan detail berikut menjawab rumusan masalah satu per satu.
+\begin{enumerate}
+\item	Membandingkan empat cara pemilihan tabel, lalu memilih satu cara untuk prototipe. Tujuan ini menjawab rumusan masalah nomor 1. Kriteria keberhasilan: jumlah perintah SQL gagal pada cara terpilih lebih kecil daripada jumlah pada sistem sekarang. Penulis mengukur keduanya pada kumpulan pertanyaan uji yang sama. Penulis belum menetapkan angka target.
+\item	Membandingkan empat cara pemeriksaan jawaban, lalu memilih satu cara untuk prototipe. Tujuan ini menjawab rumusan masalah nomor 2. Kriteria keberhasilan: cara terpilih menandai jawaban yang nilainya tidak ada pada hasil query. Penulis menghitung jumlah temuan benar dan jumlah temuan salah. Penulis belum menetapkan angka target.
+\item	Mengukur tambahan waktu, token, dan jumlah perintah SQL dari prototipe. Tujuan ini menjawab rumusan masalah nomor 3. Kriteria keberhasilan: prototipe tetap berjalan di dalam batas Wingman sekarang, yaitu 300 baris hasil, 30 detik per perintah, dan 60 perintah per pekerjaan.
+\end{enumerate}
+
+Penulis mengukur seluruh kriteria di atas terhadap sistem Wingman yang berjalan sekarang. Penulis menyusun kumpulan pertanyaan uji lebih dulu, lalu mengukur nilai awal sistem sekarang. Nilai awal itu menjadi pembanding. Bentuk kriteria keberhasilan, berupa angka atau berupa penilaian, menunggu keputusan dosen pembimbing.
 
 % --- Batasan Masalah ---
 \section{Ruang Lingkup, Asumsi, dan Batasan Masalah}
-Tuliskan ruang lingkup, asumsi, dan batasan-batasan yang diambil dalam pelaksanaan tugas akhir. Batasan ini dapat dihindari (bersifat opsional, tidak perlu ada) jika topik atau judul tugas akhir dibuat cukup spesifik.
-
-\section{Hipotugas akhir}
-Tuliskan hipotugas akhir yang akan diuji dalam pelaksanaan tugas akhir. 
-Hipotugas akhir ini merupakan pernyataan yang dapat diuji kebenarannya melalui proses pelaksanaan tugas akhir, 
-terutama pada tahap evaluasi. Hipotugas akhir yang baik memiliki karakteristik sebagai berikut:
+Ruang lingkup tugas akhir ini adalah sebagai berikut.
 \begin{enumerate}
-    \item Spesifik: Hipotugas akhir harus jelas dan spesifik, sehingga dapat diuji dengan cara yang terukur.
-    \item Terukur: Hipotugas akhir harus dapat diuji dengan data atau informasi yang dapat diukur, sehingga dapat dinilai kebenarannya.
-    \item Relevan: Hipotugas akhir harus relevan dengan topik tugas akhir dan dapat memberikan kontribusi yang signifikan terhadap penyelesaian masalah yang dibahas.
-    \item Dapat diuji: Hipotugas akhir harus dapat diuji melalui proses pelaksanaan tugas akhir, terutama pada tahap evaluasi, sehingga dapat dinilai kebenarannya.
+\item	Objek penelitian adalah Wingman Assistant pada Wingman Web App milik PHE OSES.
+\item	Pengguna yang ditinjau adalah engineer produksi.
+\item	Domain data mencakup produksi sumur, pemasangan dan penarikan pompa ESP, serta penanganan masalah pompa. ESP adalah pompa listrik yang dipasang di dalam sumur.
+\item	Keluaran tugas akhir ini berupa prototipe untuk eksperimen, bukan produk siap pakai.
 \end{enumerate}
 
-Hipotugas akhir diperoleh dari premis-premis yang ada pada latar belakang dan rumusan masalah. 
-Oleh karena itu, tuliskan dulu premis-premis yang menentukan hipotugas akhir tersebut sebelum menuliskan hipotugas akhirnya.
+Batasan jumlah tabel adalah sebagai berikut.
 
+Penulis memakai sebagian tabel, bukan seluruh 206 tabel. Kandidat tabel inti berjumlah 12, yaitu well\_status, well\_status\_records, esp\_shut\_in\_events, esp\_dhp\_events, esp\_installations, esp\_pump\_request, esp\_troubleshooting\_events, barge\_schedules, jobs, wells, platforms, dan barges. Penulis menetapkan jumlah akhirnya bersama domain expert.
 
+Penulis membatasi jumlah tabel karena tiga alasan. Pertama, penulis menulis deskripsi tabel dan kolom secara manual. Basis data hanya menyimpan keterangan pada 15 tabel dan 1 kolom. Menulis keterangan untuk 3.249 kolom melampaui waktu satu semester. Kedua, data contoh hanya berisi isi pada 166 dari 206 tabel. Tabel kosong tidak dapat diuji. Ketiga, jumlah penilai terbatas. Tabel al\_area\_engineers berisi 3 baris. Penulis belum mengonfirmasi angka itu kepada pihak PHE OSES.
+
+Batasan domain adalah sebagai berikut.
+
+Penulis tidak memakai skema staging dan skema etl. Skema staging berisi 38 tabel. Skema etl berisi 11 tabel. Penulis juga tidak memakai modul qaqc, modul scale, dan modul mbti.
+
+Penulis membuang kedua skema itu karena dua alasan. Pertama, 37 dari 38 nama tabel di staging kembar dengan nama tabel di public. Nama kembar menambah pilihan salah bagi chatbot. Kedua, aturan Wingman sendiri melarang chatbot memakai kedua skema tersebut. Chatbot mencatat larangan itu pada langkah berpikirnya.
+
+Batasan perangkat dan konfigurasi adalah sebagai berikut.
+
+Penulis memakai konfigurasi Wingman yang berjalan sekarang. Model bawaannya adalah qwen3.5:9b. Nilai temperature adalah 0,2. Jendela konteks berukuran 65.536 token. Batas hasil query adalah 300 baris. Batas waktu satu perintah adalah 30 detik. Batas perintah per pekerjaan adalah 60. Batas riwayat percakapan adalah 300 pesan.
+
+Penulis memakai batas yang sama dengan sistem berjalan agar hasil ukurnya dapat dibandingkan. Perangkat eksperimen belum ditetapkan. Penulis memilih antara GPU pada laptop pribadi dan GPU sewa di cloud. Penulis memutuskan pilihan itu setelah menghitung biayanya.
+
+Asumsi tugas akhir ini adalah sebagai berikut.
+\begin{enumerate}
+\item	Data contoh mewakili data produksi. Penulis belum menguji asumsi ini.
+\item	Nama sumur pada data contoh sudah diganti alias. Manifest mencatat nilai wellNameLeakCount sama dengan 0.
+\item	Petroleum engineer produksi menilai benar atau salahnya jawaban chatbot.
+\item	Arti istilah operasional seperti DHP, shut-in, SI, dan SIS berasal dari domain expert. Penulis belum memperoleh penjelasan tersebut.
+\end{enumerate}
+
+\section{Hipotugas akhir}
+Catatan: kategori tugas akhir ini belum ditetapkan. Dosen pembimbing belum memutuskan antara Penelitian dan Proyek Akhir. Bentuk subbab ini mengikuti keputusan tersebut. Penulis menyiapkan dua versi di bawah ini.
+
+Premis berikut mendasari kedua versi.
+\begin{enumerate}
+\item	Chatbot menjalankan 12 perintah SQL pada satu percakapan. Empat perintah gagal karena tabel atau kolom yang salah.
+\item	Basis data menyimpan keterangan pada 15 tabel dan 1 kolom saja.
+\item	\textcite{talaei2024chesscontextualharnessingefficient} mencatat kenaikan akurasi 2\% dari pemangkasan skema lebih dulu.
+\item	\textcite{liao2026entsqlbenchmarkgroundingtexttosql} mencatat 96,0\% contoh membutuhkan pengetahuan di luar skema.
+\item	Chatbot menulis jawaban yang tidak cocok dengan catatan langkahnya sendiri.
+\end{enumerate}
+
+Versi A, jika tugas akhir ini masuk kategori Penelitian.
+
+H0-1: Jumlah perintah SQL gagal pada sistem dengan pemilihan tabel bertahap sama dengan jumlah pada sistem sekarang.\\
+H1-1: Jumlah perintah SQL gagal pada sistem dengan pemilihan tabel bertahap lebih kecil daripada jumlah pada sistem sekarang.\\
+H0-2: Jumlah jawaban tanpa pasangan hasil query sama pada sistem dengan pemeriksaan dan sistem tanpa pemeriksaan.\\
+H1-2: Jumlah jawaban tanpa pasangan hasil query lebih kecil pada sistem dengan pemeriksaan.\\
+H0-3: Waktu jawab sistem usulan sama dengan waktu jawab sistem sekarang.\\
+H1-3: Waktu jawab sistem usulan lebih besar daripada sistem sekarang, tetapi tetap di bawah batas 30 detik per perintah.
+
+Versi B, jika tugas akhir ini masuk kategori Proyek Akhir.
+
+Target kinerja: prototipe menurunkan jumlah perintah SQL gagal dan jumlah jawaban tanpa pasangan hasil query. Penulis mengukur keduanya pada kumpulan pertanyaan uji yang sama. Prototipe tetap berjalan di dalam batas 300 baris, 30 detik, dan 60 perintah. Penulis belum menetapkan angka target.
+
+Asumsi pengujian: penilai jawaban adalah petroleum engineer produksi. Kumpulan pertanyaan uji berasal dari pertanyaan nyata engineer. Data contoh mewakili data produksi.
+
+Keterbatasan: penulis menguji satu basis data pada satu perusahaan. Penulis memakai sebagian tabel, bukan seluruh 206 tabel. Penulis memakai satu model bahasa lokal. Hasil ukur belum tentu berlaku pada basis data lain.
 
 % --- Metodologi Pengerjaan TA ---
 \section{Metodologi}
-Tuliskan semua tahapan spesifik yang akan dilalui selama pelaksanaan tugas akhir. 
-Ada beberapa pendekatan metodologi yang dapat digunakan dalam pelaksanaan tugas akhir sesuai dengan topik yang dibahas, 
-misalnya Design Science Research Methodology (DSRM), Design Research Methodology (DRM), Cross-Industry Standard Process for Data Mining (CRISP-DM), dan sebagainya.
-
-Secara umum,  metodologi pengerjaan tugas akhir meliputi tahapan, langkah-langkah, atau tata cara melakukan:
+Penulis menjalankan enam tahap berikut.
 \begin{enumerate}
-\item	Investigasi pengumpulan fakta di latar belakang untuk merumuskan masalah.
-\item	Pencarian, pengelompokan, dan penapisan literatur atau sumber informasi untuk mengumpulkan informasi yang relevan tentang topik yang diangkat, termasuk teori (konsep atau teori apa saja yang perlu dicari), hal-hal yang telah dicapai oleh orang lain (cara mencari dan kata kuncinya), dan berbagai informasi pendukung, untuk mencari solusi terhadap masalah yang dibahas. Gunakan metodologi yang tepat dalam menggali informasi dan dokumentasikan prosesnya (termasuk rekaman wawancara atau survei) di dalam Lampiran, termasuk tautan ke video atau foto. Hasil penggalian informasi ini akan dijelaskan secara komprehensif di Bab II Studi Literatur.
-\item   Analisis kebutuhan berdasarkan hasil investigasi dan studi literatur. Jelaskan metode yang digunakan untuk melakukan analisis kebutuhan, misalnya wawancara, survei, observasi, atau studi kasus. Hasil analisis kebutuhan ini akan dijelaskan secara rinci di bab berikutnya.
-\item   Perancangan solusi berdasarkan hasil analisis kebutuhan. Jelaskan metode atau tahapan perancangan yang digunakan, dengan abstraksi yang bertahap dari generik ke spesifik, misalnya dengan pendekatan \textit{C4 model}. Selain itu, gunakan alat bantu penggambaran diagram yang tepat, misalnya menggunakan diagram UML, SySML, ERD, atau yang lainnya. 
-\item   Jika ada implementasi terhadap hasil rancangan, jelaskan teknologi dan alat bantu yang digunakan untuk mengimplementasikan rancangan. 
-\item   Evaluasi terhadap solusi yang telah diimplementasikan. Jelaskan metode pengujian, metrik evaluasi, atau studi kasus yang digunakan untuk menilai keberhasilan solusi. 
-\item   Penarikan kesimpulan dan saran berdasarkan hasil pelaksanaan tugas akhir berdasarkan hasil evaluasi.   
-\vfill % memaksa konten di atas untuk berada di bagian atas halaman dan menyisakan ruang kosong di bawah konten ini akibat berakhirnya section ini
+\item	Investigasi masalah. Penulis membaca dump basis data Wingman. Penulis menghitung jumlah tabel, kolom, dan foreign key. Penulis membaca catatan langkah pada percakapan nyata. Penulis mewawancarai domain expert dari PHE OSES. Keluaran tahap ini adalah daftar fakta beserta sumbernya.
+\item	Studi literatur. Penulis mencari pustaka di arXiv, ACL Anthology, dan IEEE Xplore. Penulis juga membaca laporan rekayasa dari perusahaan. Penulis memilih pustaka dengan dua kriteria. Kriteria pertama adalah kebaruan, yaitu terbit tahun 2023 ke atas. Pustaka teori dasar tidak terkena batas tahun. Kriteria kedua adalah relevansi terhadap tiga topik, yaitu Text-to-SQL pada basis data besar, pemilihan tabel, dan kesesuaian jawaban dengan sumber. Keluaran tahap ini adalah Bab II.
+\item	Analisis kebutuhan dan perbandingan pendekatan. Penulis menyusun kebutuhan engineer produksi. Penulis membandingkan empat cara pemilihan tabel. Penulis juga membandingkan empat cara pemeriksaan jawaban. Penulis memakai kriteria terukur pada setiap perbandingan. Keluaran tahap ini adalah Bab III beserta tabel perbandingannya.
+\item	Perancangan solusi. Penulis menggambar alur sistem sekarang. Penulis lalu menggambar alur sistem usulan. Penulis menjelaskan setiap komponen dan aliran datanya. Keluaran tahap ini adalah Bab IV.
+\item	Implementasi prototipe. Penulis membangun tabel deskripsi. Penulis membangun modul pemilih tabel. Penulis membangun modul pemeriksa jawaban. Penulis menyatukan ketiganya ke dalam satu alur. Keluaran tahap ini adalah prototipe.
+\item	Eksperimen dan evaluasi. Penulis menyusun kumpulan pertanyaan uji. Penulis mengukur nilai awal sistem sekarang. Penulis lalu mengukur prototipe dengan konfigurasi berbeda. Penulis menjalankan pengujian di GPU secara berkala, bukan di akhir. Keluaran tahap ini adalah hasil ukur dan jawaban atas rumusan masalah.
 \end{enumerate}
+
+Penulis mengusulkan Design Science Research Methodology sebagai kerangka enam tahap di atas. Dosen pembimbing belum memutuskan kerangka tersebut.
 
 % --- Sistematika Penulisan ---
 \section{Sistematika Penulisan}
-Tuliskan gambaran umum isi dari setiap bab yang ada dalam laporan tugas akhir. Sistematika penulisan ini memberikan panduan bagi pembaca tentang struktur dan alur pembahasan dalam laporan tugas akhir. Berikut adalah contoh sistematika penulisan yang dapat diikuti:
+Proposal tugas akhir ini terdiri atas lima bab.
 \begin{enumerate}
-\item	Bab I Pendahuluan: Berisi latar belakang, rumusan masalah, tujuan, batasan masalah, metodologi, dan sistematika penulisan laporan tugas akhir       .
-\item	Bab II Studi Literatur: Berisi kajian pustaka yang relevan dengan topik tugas akhir, termasuk teori-teori, konsep-konsep, dan hasil-hasil penelitian sebelumnya yang                mendukung pelaksanaan tugas akhir.
-\item	Bab III Analisis dan Desain: Berisi penjelasan tentang analisis masalah dan kebutuhan pengguna serta berbagai alternatif solusinya.
-\item   Bab IV Perancangan: Berisi penjelasan tentang perancangan solusi yang diusulkan, misalnya arsitektur sistem, desain basis data, antarmuka pengguna, dan sebagainya.
-\item	Bab V Implementasi: Berisi penjelasan tentang proses implementasi solusi yang diusulkan, termasuk langkah-langkah yang diambil, teknologi yang digunakan, dan hasil yang diperoleh.
-\item	Bab VI Evaluasi: Berisi analisis dan evaluasi terhadap solusi yang diimplementasikan, termasuk metode pengujian, hal-hal yang disiapkan sebelum pengujian, hasil pengujian, dan penilaian kinerja.                  
-\item   Bab VII Kesimpulan dan Saran: Berisi kesimpulan dari hasil pelaksanaan tugas akhir dan saran untuk pengembangan lebih lanjut.
-\item   Daftar Pustaka: Berisi daftar referensi yang digunakan dalam penyusunan laporan tugas akhir.
-\item   Lampiran: Berisi dokumen-dokumen pendukung seperti kode program, data lengkap hasil pengujian, rekaman wawancara, dan lain-lain. 
+\item	Bab I Pendahuluan berisi latar belakang, rumusan masalah, tujuan, ruang lingkup, hipotesis, metodologi, dan sistematika penulisan.
+\item	Bab II Studi Literatur berisi penjelasan kasus yang dikaji, teori yang dipakai, dan penelitian terdahulu yang relevan.
+\item	Bab III Analisis Masalah berisi analisis kondisi sekarang, analisis kebutuhan, dan perbandingan alternatif pendekatan.
+\item	Bab IV Desain Konsep Solusi berisi rancangan sistem sekarang, rancangan sistem usulan, dan perbandingan keduanya.
+\item	Bab V Rencana Selanjutnya berisi rencana implementasi, rencana evaluasi, dan analisis risiko.
 \end{enumerate}

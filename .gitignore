@@ -1,1 +1,25 @@
 .DS_Store
+
+# --- Hasil kompilasi LaTeX ---
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.equ
+*.fdb_latexmk
+*.fls
+*.lof
+*.log
+*.lot
+*.out
+*.run.xml
+*.synctex.gz
+*.toc
+*.xdv
+ProposalTA.pdf
+
+# --- Keluaran dan aset pipeline DOCX (dibuat ulang oleh tools/tex-to-docx.sh) ---
+out/
+tools/apa.csl
+tools/referensi-docx.docx
+/docs
